@@ -1,6 +1,6 @@
 import * as userRepo from "../repositories/user.repository.js";
 import { hashPassword, comparePassword } from "../utils/password.js";
-import { generateTokenPair, verifyRefreshToken } from "../utils/jwt.js";
+import { generateTokenPair, verifyRefreshToken } from "../utils/Jwt.js";
 import { AppError } from "../middleware/errorHandler.js";
 
 export const register = async ({ name, email, password }) => {
