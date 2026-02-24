@@ -1,4 +1,4 @@
-import { verifyAccessToken } from "../utils/Jwt.js";
+import { verifyAccessToken } from "../utils/jwt.js";
 import { unauthorizedResponse } from "../utils/apiResponse.js";
 import User from "../models/user.js";
 
