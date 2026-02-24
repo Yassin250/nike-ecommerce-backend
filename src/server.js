@@ -1,7 +1,7 @@
-import dotenv from "dotenv";
-
+import dotenv from 'dotenv';
 dotenv.config();
 
+// ✅ NOW IMPORT EVERYTHING ELSE
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
