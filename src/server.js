@@ -1,10 +1,13 @@
 import dotenv from "dotenv";
+
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
-dotenv.config();
+
 
 import connectDB from "./config/db.js";
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -16,7 +19,7 @@ import orderRoutes   from "./routes/order.routes.js";
 import stripeRoutes  from "./routes/stripe.routes.js";
 import adminRoutes   from "./routes/admin.routes.js";
 import userRoutes    from "./routes/user.routes.js";
-import uploadRoutes  from "./routes/upload.routes.js";
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -40,7 +43,6 @@ app.use("/api/cart",     cartRoutes);
 app.use("/api/orders",   orderRoutes);
 app.use("/api/admin",    adminRoutes);
 app.use("/api/users",    userRoutes);
-app.use("/api/upload",   uploadRoutes);
 
 app.get("/health", (req, res) => {
     res.json({ success: true, message: "Server is running", timestamp: new Date() });
