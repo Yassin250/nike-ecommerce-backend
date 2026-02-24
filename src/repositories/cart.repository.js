@@ -1,4 +1,4 @@
-import Cart from "../models/Cart.js";
+import Cart from "../models/cart.js";
 
 export const findByUser = (userId) =>
     Cart.findOne({ user: userId }).populate("items.product", "name image images price inStock sizes colors");
