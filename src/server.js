@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+// ✅ NOW IMPORT EVERYTHING ELSE
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -23,39 +24,41 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB
 connectDB();
 
-// Security & Logging
+// Security middleware
 app.use(helmet());
 app.use(morgan("dev"));
 
-// ✅ CORS Configuration - Allow both local and production
+// ✅ FIXED: PROPER CORS CONFIGURATION FOR PRODUCTION
 const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    process.env.CLIENT_URL, // Railway will have Vercel URL here
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://nike-ecommerce-frontend-fawn.vercel.app",
+    "https://nike-ecommerce-frontend.vercel.app",
+    process.env.CLIENT_URL
 ].filter(Boolean); // Remove any undefined values
 
-app.use(cors({ 
+app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or Postman)
+        // Allow requests with no origin (like mobile apps, Postman, curl)
         if (!origin) return callback(null, true);
         
-        if (allowedOrigins.indexOf(origin) !== -1) {
+        // Check if the origin is allowed
+        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            console.log('🚫 CORS blocked for origin:', origin);
+            callback(new Error('CORS policy: This origin is not allowed'), false);
         }
     },
-    credentials: true 
+    credentials: true, // Allow cookies/auth headers
+    optionsSuccessStatus: 200 // For legacy browser support
 }));
 
-// ⚠️  Stripe webhook BEFORE express.json() — needs raw body
+// ⚠️ Stripe webhook BEFORE express.json() — needs raw body
 app.use("/api/payments", stripeRoutes);
 
-// Body parsing
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
-
-// Rate limiting
 app.use(apiLimiter);
 
 // Routes
@@ -71,8 +74,8 @@ app.get("/health", (req, res) => {
     res.json({ 
         success: true, 
         message: "Server is running", 
-        timestamp: new Date(),
-        env: process.env.NODE_ENV 
+        environment: process.env.NODE_ENV || "development",
+        timestamp: new Date().toISOString() 
     });
 });
 
@@ -80,7 +83,7 @@ app.get("/health", (req, res) => {
 app.use((req, res) => {
     res.status(404).json({ 
         success: false, 
-        message: `Route ${req.originalUrl} not found` 
+        message: `Route ${req.method} ${req.originalUrl} not found` 
     });
 });
 
@@ -89,9 +92,9 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📦 Environment: ${process.env.NODE_ENV || "development"}`);
-    console.log(`🌍 Allowed origins:`, allowedOrigins);
+    console.log(`🔗 Allowed origins:`, allowedOrigins);
 });
 
 export default app;
